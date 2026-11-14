@@ -9,12 +9,15 @@ function clearAlert(){ $('alert').className='alert hidden'; }
 function showPage(name){
  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===`page-${name}`));
  document.querySelectorAll('.nav-link').forEach(a=>a.classList.toggle('active',a.dataset.page===name));
- const labels={dashboard:'Dashboard',analysis:'Storage Analysis',folders:'Folders',large:'Large Files',categories:'File Categories',recommendations:'Recommendations',history:'Scan History',settings:'Settings'};
- $('page-title').textContent=labels[name]||'Dashboard'; location.hash=name;
+ const labels={dashboard:'Dashboard',analysis:'Storage Analysis',folders:'Folders',recommendations:'Recommendations',history:'Scan History',settings:'Settings'};
+ $('page-title').textContent=labels[name]||'Dashboard';
+ const showNewScan=['dashboard','folders','recommendations','history'].includes(name);
+ $('top-new-scan').classList.toggle('hidden',!showNewScan);
+ location.hash=name;
  if(name==='history') loadHistory(); if(name==='large') renderFiles(); if(name==='folders') renderFolders();
 }
 document.querySelectorAll('[data-page]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();showPage(a.dataset.page)}));
-$('top-scan').onclick=()=>showPage('analysis');
+$('top-new-scan').onclick=()=>{showPage('analysis');};
 $('browse-btn').onclick=async()=>{clearAlert();try{const r=await fetch('/api/select-folder',{method:'POST'});const d=await r.json();if(d.path)$('folder-path').value=d.path;else if(d.error)alertMsg(d.error);}catch(e){alertMsg('Could not open the folder picker. Enter the full folder path manually.');}};
 $('scan-btn').onclick=runScan;
 $('apply-threshold').onclick=()=>{$('threshold').value=$('settings-threshold').value;showPage('analysis');alertMsg('Threshold applied to the scanner.','success');};
@@ -24,17 +27,17 @@ async function runScan(){
  clearAlert(); const path=$('folder-path').value.trim(); const threshold=Number($('threshold').value);
  if(!path){alertMsg('Choose a folder or enter its full path first.');return;}
  if(!Number.isFinite(threshold)||threshold<0){alertMsg('Enter a valid non-negative threshold in MB.');return;}
- $('scan-btn').disabled=true;$('scan-btn').textContent='Scanning…';$('scan-progress').classList.remove('hidden');$('progress-status').textContent='SCANNING';
+ $('scan-btn').disabled=true;$('scan-btn').textContent='Scanning…';$('scan-progress').classList.remove('hidden','completed');$('progress-label').textContent='Scanning selected directory…';$('progress-status').textContent='SCANNING';
  try{
   const response=await fetch('/api/scan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({path,threshold_mb:threshold})});
   const data=await response.json(); if(!response.ok)throw new Error(data.error||'Scan failed.');
   const full=await fetch('/api/results'); const result=await full.json(); current=result;
-  renderAll();$('progress-label').textContent='Scan completed successfully';$('progress-status').textContent='COMPLETE';$('scan-status').textContent='Complete';
+  renderAll();$('scan-progress').classList.add('completed');$('progress-label').textContent='Scan completed';$('progress-status').textContent='';$('scan-status').textContent='Complete';
   $('scan-files').textContent=data.summary.file_count.toLocaleString();$('scan-folders').textContent=data.summary.folder_count.toLocaleString();$('scan-size').textContent=data.summary.total_size;
   $('scan-errors').classList.toggle('hidden',!data.errors.length);
   if(data.errors.length)$('scan-errors').innerHTML=`Some entries could not be read (${data.errors.length} shown):<ul>${data.errors.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`;
   alertMsg(`Scan complete — ${data.summary.file_count} files analyzed.`, 'success'); showPage('dashboard');
- }catch(err){$('progress-status').textContent='FAILED';$('scan-status').textContent='Failed';alertMsg(err.message);}
+ }catch(err){$('scan-progress').classList.remove('completed');$('progress-status').textContent='FAILED';$('scan-status').textContent='Failed';alertMsg(err.message);}
  finally{$('scan-btn').disabled=false;$('scan-btn').innerHTML='Start scan <span>→</span>';}
 }
 function renderAll(){
@@ -86,3 +89,6 @@ async function loadHistory(){
  try{const r=await fetch('/api/history'),d=await r.json();$('history-table').innerHTML=d.history.length?d.history.map(h=>`<tr><td>${esc(h.scanned_at)}</td><td title="${esc(h.root)}">${esc(h.root)}</td><td class="size-cell">${fmt(h.total_bytes)}</td><td>${h.file_count}</td><td>${h.large_count}</td></tr>`).join(''):'<tr><td colspan="5" class="empty-cell">No scan history yet.</td></tr>';}catch(e){alertMsg('Could not load scan history.');}
 }
 window.addEventListener('load',()=>{const p=location.hash.replace('#','');if(p&&$('page-'+p))showPage(p);});
+
+const initialPage=(location.hash||'#dashboard').slice(1);
+showPage(['dashboard','analysis','folders','recommendations','history','settings'].includes(initialPage)?initialPage:'dashboard');

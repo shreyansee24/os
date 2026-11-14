@@ -62,3 +62,7 @@ vault/
 - Folder totals are inclusive: a parent folder's size includes files in all descendant folders. Therefore, do not add parent and child rows together.
 - This app does not calculate free disk capacity; it reports the size of files inside the selected directory.
 - Chart.js is loaded from its public CDN, so an internet connection is required for charts. The rest of the app runs locally.
+
+
+## Workspace navigation update
+The Workspace sidebar contains Dashboard, Storage Analysis, Folders, Recommendations, Scan History, and Settings. The separate Large Files and File Categories navigation tabs are removed. The New Scan header action is not shown; scanning remains available through Start scan in Storage Analysis. Dashboard storage-by-file-type and largest-files summaries are retained.

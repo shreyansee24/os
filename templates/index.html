@@ -5,7 +5,7 @@
   <title>Vault | Smart Storage Analyzer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v='workspace-cleaned-3') }}">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -17,8 +17,6 @@
       <a class="nav-link active" href="#dashboard" data-page="dashboard"><span>▦</span> Dashboard</a>
       <a class="nav-link" href="#analysis" data-page="analysis"><span>◉</span> Storage Analysis</a>
       <a class="nav-link" href="#folders" data-page="folders"><span>▰</span> Folders</a>
-      <a class="nav-link" href="#large" data-page="large"><span>↗</span> Large Files</a>
-      <a class="nav-link" href="#categories" data-page="categories"><span>◌</span> File Categories</a>
       <a class="nav-link" href="#recommendations" data-page="recommendations"><span>✧</span> Recommendations</a>
       <a class="nav-link" href="#history" data-page="history"><span>◷</span> Scan History</a>
       <a class="nav-link" href="#settings" data-page="settings"><span>⚙</span> Settings</a>
@@ -26,7 +24,7 @@
     <div class="sidebar-bottom"><div class="safe-pill"><span class="pulse"></span><div><b>Local & private</b><small>Read-only scanning</small></div></div><small class="version">VAULT v1.0.0</small></div>
   </aside>
   <main class="main">
-    <header class="topbar"><div><div class="eyebrow">STORAGE OVERVIEW</div><h1 id="page-title">Dashboard</h1></div><div class="top-actions"><span class="local-status"><i></i> LOCAL INSTANCE</span><button class="btn btn-primary" id="top-scan">＋ New scan</button></div></header>
+    <header class="topbar"><div><div class="eyebrow">STORAGE OVERVIEW</div><h1 id="page-title">Dashboard</h1></div><div class="top-actions"><button class="btn btn-primary top-new-scan hidden" id="top-new-scan">＋ New Scan</button><span class="local-status"><i></i> LOCAL INSTANCE</span></div></header>
     <div id="alert" class="alert hidden"></div>
     <section class="page active" id="page-dashboard">
       <div class="welcome-row"><div><h2>Your storage, <span>understood.</span></h2><p>See where your space goes and find what deserves a closer look.</p></div><div class="scan-root" id="scan-root">No scan performed yet</div></div>
@@ -39,7 +37,7 @@
       <div class="dashboard-grid">
         <article class="panel chart-panel"><div class="panel-heading"><div><h3>Storage by file type</h3><p>How your scanned space is distributed</p></div><span class="panel-kicker">CATEGORIES</span></div><div class="chart-wrap doughnut-wrap"><canvas id="categoryChart"></canvas><div class="chart-center"><b id="chart-total">—</b><small>SCANNED</small></div></div><div id="category-legend" class="legend"></div></article>
         <article class="panel chart-panel"><div class="panel-heading"><div><h3>Folder usage</h3><p>Largest folders in the selected directory</p></div><span class="panel-kicker">TOP 7</span></div><div class="chart-wrap bar-wrap"><canvas id="folderChart"></canvas></div></article>
-        <article class="panel"><div class="panel-heading"><div><h3>Largest files</h3><p>Items using the most space</p></div><a href="#large" class="text-link" data-page="large">View all ↗</a></div><div id="top-files" class="compact-list empty-state">Run a scan to populate this list.</div></article>
+        <article class="panel"><div class="panel-heading"><div><h3>Largest files</h3><p>Items using the most space</p></div><span class="panel-kicker">TOP 5</span></div><div id="top-files" class="compact-list empty-state">Run a scan to populate this list.</div></article>
         <article class="panel"><div class="panel-heading"><div><h3>Storage insights</h3><p>Recommendations based on your scan</p></div><span class="sparkle">✧</span></div><div id="dashboard-tips" class="tip-list"><div class="empty-state">Your insights will appear after a scan.</div></div></article>
       </div>
     </section>
@@ -64,5 +62,5 @@
     <footer>VAULT STORAGE INTELLIGENCE <span>Built for local analysis · Your files stay yours</span></footer>
   </main>
 </div>
-<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+<script src="{{ url_for('static', filename='js/script.js', v='workspace-cleaned-3') }}"></script>
 </body></html>
