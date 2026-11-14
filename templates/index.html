@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vault | Smart Storage Analyzer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-mark">V</div><div><b>vault</b><small>STORAGE INTELLIGENCE</small></div></div>
+    <div class="nav-label">WORKSPACE</div>
+    <nav>
+      <a class="nav-link active" href="#dashboard" data-page="dashboard"><span>▦</span> Dashboard</a>
+      <a class="nav-link" href="#analysis" data-page="analysis"><span>◉</span> Storage Analysis</a>
+      <a class="nav-link" href="#folders" data-page="folders"><span>▰</span> Folders</a>
+      <a class="nav-link" href="#large" data-page="large"><span>↗</span> Large Files</a>
+      <a class="nav-link" href="#categories" data-page="categories"><span>◌</span> File Categories</a>
+      <a class="nav-link" href="#recommendations" data-page="recommendations"><span>✧</span> Recommendations</a>
+      <a class="nav-link" href="#history" data-page="history"><span>◷</span> Scan History</a>
+      <a class="nav-link" href="#settings" data-page="settings"><span>⚙</span> Settings</a>
+    </nav>
+    <div class="sidebar-bottom"><div class="safe-pill"><span class="pulse"></span><div><b>Local & private</b><small>Read-only scanning</small></div></div><small class="version">VAULT v1.0.0</small></div>
+  </aside>
+  <main class="main">
+    <header class="topbar"><div><div class="eyebrow">STORAGE OVERVIEW</div><h1 id="page-title">Dashboard</h1></div><div class="top-actions"><span class="local-status"><i></i> LOCAL INSTANCE</span><button class="btn btn-primary" id="top-scan">＋ New scan</button></div></header>
+    <div id="alert" class="alert hidden"></div>
+    <section class="page active" id="page-dashboard">
+      <div class="welcome-row"><div><h2>Your storage, <span>understood.</span></h2><p>See where your space goes and find what deserves a closer look.</p></div><div class="scan-root" id="scan-root">No scan performed yet</div></div>
+      <div class="stats-grid">
+        <article class="stat-card"><div class="stat-top"><span>Total storage scanned</span><span class="stat-icon purple">◫</span></div><strong id="stat-size">—</strong><small>Across selected directory</small></article>
+        <article class="stat-card"><div class="stat-top"><span>Total files found</span><span class="stat-icon blue">▤</span></div><strong id="stat-files">—</strong><small>Readable files indexed</small></article>
+        <article class="stat-card"><div class="stat-top"><span>Folders analyzed</span><span class="stat-icon cyan">▰</span></div><strong id="stat-folders">—</strong><small>Including nested folders</small></article>
+        <article class="stat-card"><div class="stat-top"><span>Large files identified</span><span class="stat-icon orange">↗</span></div><strong id="stat-large">—</strong><small id="large-subtitle">Based on your threshold</small></article>
+      </div>
+      <div class="dashboard-grid">
+        <article class="panel chart-panel"><div class="panel-heading"><div><h3>Storage by file type</h3><p>How your scanned space is distributed</p></div><span class="panel-kicker">CATEGORIES</span></div><div class="chart-wrap doughnut-wrap"><canvas id="categoryChart"></canvas><div class="chart-center"><b id="chart-total">—</b><small>SCANNED</small></div></div><div id="category-legend" class="legend"></div></article>
+        <article class="panel chart-panel"><div class="panel-heading"><div><h3>Folder usage</h3><p>Largest folders in the selected directory</p></div><span class="panel-kicker">TOP 7</span></div><div class="chart-wrap bar-wrap"><canvas id="folderChart"></canvas></div></article>
+        <article class="panel"><div class="panel-heading"><div><h3>Largest files</h3><p>Items using the most space</p></div><a href="#large" class="text-link" data-page="large">View all ↗</a></div><div id="top-files" class="compact-list empty-state">Run a scan to populate this list.</div></article>
+        <article class="panel"><div class="panel-heading"><div><h3>Storage insights</h3><p>Recommendations based on your scan</p></div><span class="sparkle">✧</span></div><div id="dashboard-tips" class="tip-list"><div class="empty-state">Your insights will appear after a scan.</div></div></article>
+      </div>
+    </section>
+    <section class="page" id="page-analysis">
+      <div class="page-intro"><h2>Analyze a directory</h2><p>Choose a folder on this computer. Vault reads file metadata only and never changes your files.</p></div>
+      <div class="panel scan-panel">
+        <div class="scan-illustration">⌁</div><h3>Choose a folder to get started</h3><p>Select any directory you want Vault to inspect, including its nested folders.</p>
+        <div class="path-row"><input id="folder-path" type="text" placeholder="Choose a folder or enter a full path, e.g. C:\Users\You\Documents"><button class="btn btn-secondary" id="browse-btn">Browse folders</button></div>
+        <div class="scan-controls"><label>Large file threshold <div class="threshold-input"><input type="number" id="threshold" value="100" min="0" step="1"><span>MB</span></div></label><button class="btn btn-primary btn-large" id="scan-btn">Start scan <span>→</span></button></div>
+        <div id="scan-progress" class="progress-area hidden"><div class="progress-head"><span id="progress-label">Scanning selected directory…</span><span id="progress-status">PLEASE WAIT</span></div><div class="progress-track"><div class="progress-fill"></div></div></div>
+        <div class="privacy-note">♧ &nbsp;Your scan stays on this computer. Symbolic links are skipped for safety.</div>
+      </div>
+      <div class="stats-grid scan-results-stats"><article class="stat-card"><small>Files scanned</small><strong id="scan-files">—</strong></article><article class="stat-card"><small>Folders scanned</small><strong id="scan-folders">—</strong></article><article class="stat-card"><small>Storage consumed</small><strong id="scan-size">—</strong></article><article class="stat-card"><small>Scan status</small><strong class="status-text" id="scan-status">Waiting</strong></article></div>
+      <div id="scan-errors" class="error-list hidden"></div>
+    </section>
+    <section class="page" id="page-folders"><div class="page-intro"><h2>Folder breakdown</h2><p>Folder sizes include all files inside their nested subfolders.</p></div><div class="panel"><div class="table-tools"><input id="folder-search" class="search-input" placeholder="⌕  Search folders…"></div><div class="table-scroll"><table><thead><tr><th>FOLDER</th><th>FILES</th><th>STORAGE USED</th><th>SHARE</th></tr></thead><tbody id="folder-table"><tr><td colspan="4" class="empty-cell">Run a scan to see folders.</td></tr></tbody></table></div></div></section>
+    <section class="page" id="page-large"><div class="page-intro"><h2>Large files</h2><p>Find individual files that account for a significant amount of storage.</p></div><div class="panel"><div class="filter-row"><input id="file-search" class="search-input" placeholder="⌕  Search by file name or location"><select id="category-filter"><option value="all">All file types</option></select><label class="min-filter">Minimum size <input type="number" id="minimum-size" min="0" value="0"> MB</label><select id="sort-order"><option value="desc">Largest first</option><option value="asc">Smallest first</option></select></div><div class="table-scroll"><table><thead><tr><th>FILE NAME</th><th>FILE TYPE</th><th>SIZE</th><th>FOLDER LOCATION</th></tr></thead><tbody id="files-table"><tr><td colspan="4" class="empty-cell">Run a scan to see files.</td></tr></tbody></table></div><div class="table-foot" id="file-count">0 files</div></div></section>
+    <section class="page" id="page-categories"><div class="page-intro"><h2>File categories</h2><p>Storage usage grouped automatically by file extension.</p></div><div id="category-cards" class="category-grid"><div class="panel empty-state">Run a scan to see category totals.</div></div><div class="panel"><div class="panel-heading"><div><h3>Category distribution</h3><p>Relative storage consumption</p></div></div><div class="chart-wrap category-bar-wrap"><canvas id="categoryBarChart"></canvas></div></div></section>
+    <section class="page" id="page-recommendations"><div class="page-intro"><h2>Recommendations</h2><p>Practical next steps generated from your actual scan data.</p></div><div id="recommendation-list" class="recommendation-list"><div class="panel empty-state">Run a scan to generate recommendations.</div></div><div class="panel safety-panel"><span>♧</span><div><h3>You stay in control</h3><p>Vault only reports what it finds. It will never automatically delete, move, rename or modify your files.</p></div></div></section>
+    <section class="page" id="page-history"><div class="page-intro"><h2>Scan history</h2><p>Your recent scans are stored locally in a small SQLite database.</p></div><div class="panel"><div class="table-scroll"><table><thead><tr><th>DATE</th><th>DIRECTORY</th><th>STORAGE</th><th>FILES</th><th>LARGE FILES</th></tr></thead><tbody id="history-table"><tr><td colspan="5" class="empty-cell">No scan history yet.</td></tr></tbody></table></div></div></section>
+    <section class="page" id="page-settings"><div class="page-intro"><h2>Settings</h2><p>Configure how Vault identifies files that may need attention.</p></div><div class="panel settings-panel"><h3>Large-file threshold</h3><p>Set the default threshold used when you start a scan. Files at or above this size are highlighted.</p><div class="settings-control"><input type="number" id="settings-threshold" value="100" min="0"><span>MB</span><button class="btn btn-secondary" id="apply-threshold">Apply to scanner</button></div><div class="setting-divider"></div><h3>Privacy & safety</h3><p>All scanning is performed by the local Flask process. Vault skips symbolic links and does not perform destructive file operations.</p><span class="safe-label">● READ-ONLY MODE ENABLED</span></div></section>
+    <footer>VAULT STORAGE INTELLIGENCE <span>Built for local analysis · Your files stay yours</span></footer>
+  </main>
+</div>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body></html>
